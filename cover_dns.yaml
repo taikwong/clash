@@ -1,0 +1,18 @@
+name: cover_dns
+unified-delay: true
+hosts:
+  localhost.localhost: #!replace
+    - 127.0.0.1
+dns:
+  # 将完全覆盖原有 default-nameserver
+  default-nameserver: #!replace
+    - system
+  # 将完全覆盖原有 nameserver
+  fake-ip-filter: #!replace
+    - '*.lan'
+    - localhost.ptlogin2.qq.com
+    - dns.msftncsi.com
+    - '*.srv.nintendo.net'
+    - '*.stun.playstation.net'
+    - 'xbox.*.microsoft.com'
+    - '*.xboxlive.com'
