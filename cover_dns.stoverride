@@ -1,7 +1,4 @@
 name: cover_dns
-unified-delay: true
-hosts:
-  localhost.localhost: 127.0.0.1
 dns:
   # 将完全覆盖原有 default-nameserver
   default-nameserver: #!replace
