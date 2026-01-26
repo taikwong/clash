@@ -1,6 +1,6 @@
 hosts:
-    localhost.localhost: 127.0.0.1
+  localhost.localhost: 127.0.0.1
     
 dns:
-    default-nameserver: [system]
-    fake-ip-filter: ['*.lan', localhost.ptlogin2.qq.com, dns.msftncsi.com, '*.srv.nintendo.net', '*.stun.playstation.net', 'xbox.*.microsoft.com', '*.xboxlive.com']
+  default-nameserver: [system]
+  fake-ip-filter: ['*.lan', localhost.ptlogin2.qq.com, dns.msftncsi.com, '*.srv.nintendo.net', '*.stun.playstation.net', 'xbox.*.microsoft.com', '*.xboxlive.com']
