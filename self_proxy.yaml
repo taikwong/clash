@@ -1,3 +1,5 @@
 payload:
   - '+.firebaselogging-pa.googleapis.com'
+  - 'firebaselogging-pa.googleapis.com'
   - '+.app-analytics-services.com'
+  - 'app-analytics-services.com'
