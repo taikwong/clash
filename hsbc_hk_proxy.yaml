@@ -2,4 +2,4 @@ payload:
   - '+.hsbc.com.hk'
   - '+.mobile.eum-appdynamics.com'
   - '+.hsbc.edge.sdk.awswaf.com'
-  - 'c-hsbc.lytics.io'
+  - '+.c-hsbc.lytics.io'
