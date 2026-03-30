@@ -14,6 +14,7 @@ payload:
   - '+.cdfgsanya.com'  #中免海南
   - '+.amazonaws.com'  #长桥证券
   - '+.chuangzuoli.com'  #AI拼车
+  - '+.atrust.sangfor.com'
   - IP-CIDR,'200.200.1.148/32',no-resolve
   - IP-CIDR,'121.12.76.27/32',no-resolve
   - IP-CIDR,'36.112.91.226/32',no-resolve
