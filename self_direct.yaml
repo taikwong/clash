@@ -15,8 +15,8 @@ payload:
   - '+.amazonaws.com'  #长桥证券
   - '+.chuangzuoli.com'  #AI拼车
   - '+.atrust.sangfor.com'
-  - '200.200.1.148/32',no-resolve
-  - '121.12.76.27/32',no-resolve
+  - '200.200.1.148/32 ,no-resolve'
+  - '121.12.76.27/32 ,no-resolve'
   - '36.112.91.226/32',no-resolve
   - '200.200.42.249/32',no-resolve
   - '58.20.54.215/32',no-resolve
