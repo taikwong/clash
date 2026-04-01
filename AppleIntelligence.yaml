@@ -9,6 +9,5 @@ payload:
   - '+.smoot.apple.com'
   - '+.apple-relay.akamaized.net'
   - '+.apple-relay.mask.apple-dns.net'
-  - '+.'
-  - '+.'
-  - '+.'
+  - '+.ai.api.apple.com'  #AppleIntelligence特定域名走代理
+  - '+.modelcatalog.icloud.com'  #AppleIntelligence特定域名走代理
