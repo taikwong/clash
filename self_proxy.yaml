@@ -1,4 +1,0 @@
-payload:
-  - '+.firebaselogging-pa.googleapis.com'
-  - '+.DOMAIN-SUFFIX,app-analytics-services.com'
-  - '+.collector.github.com'
