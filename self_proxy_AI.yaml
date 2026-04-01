@@ -1,7 +1,6 @@
 payload:
-  - '+.auth0.com'  #ChatGPT的mac客户端上抓取到的连接
-  - '+.ingest.us.sentry.io'   #ChatGPT的mac客户端上抓取到的连接
-  - '+.api.segment.io'   #ChatGPT的mac客户端上抓取到的连接
-  - '+.gstatic.com'   #ChatGPT的mac客户端上抓取到的连接
+  #- '+.auth0.com'  #ChatGPT的mac客户端上抓取到的连接
+  #- '+.ingest.us.sentry.io'   #ChatGPT的mac客户端上抓取到的连接
+  #- '+.api.segment.io'   #ChatGPT的mac客户端上抓取到的连接
   - '+.ai.api.apple.com'  #AppleIntelligence特定域名走代理
   - '+.modelcatalog.icloud.com'  #AppleIntelligence特定域名走代理
