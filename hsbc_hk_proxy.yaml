@@ -4,3 +4,4 @@ payload:
   - '+.hsbc.edge.sdk.awswaf.com'
   - '+.c-hsbc.lytics.io'
   - '+.cdnhsbcrhostorage.azureedge.net'
+  - '+.vv1865.com'
