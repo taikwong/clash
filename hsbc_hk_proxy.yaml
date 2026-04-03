@@ -3,3 +3,4 @@ payload:
   - '+.mobile.eum-appdynamics.com'
   - '+.hsbc.edge.sdk.awswaf.com'
   - '+.c-hsbc.lytics.io'
+  - '+.cdnhsbcrhostorage.azureedge.net'
