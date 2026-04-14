@@ -19,6 +19,6 @@ payload:
   - '+.atrust.sangfor.com'
   - '+.gumingnc.com'  #古茗
   - '+.iguming.net'  #古茗
-  - '+.cdn.jsdelivr.net'   cdn的geosite分支
+  - '+.cdn.jsdelivr.net'   #cdn的geosite分支
   #- '+.luckincoffeecdn.com'  #瑞幸咖啡
   #- '+.lkcoffee.com'  #瑞幸咖啡
