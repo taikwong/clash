@@ -21,5 +21,6 @@ payload:
   - '+.iguming.net'  #古茗
   - '+.cdn.jsdelivr.net'   #cdn的geosite分支
   - '+.azpromotion.com'    #万事达卡活动报名链接
+  - '+.umini.shujupie.com'   #友盟小程序分析SDK
   #- '+.luckincoffeecdn.com'  #瑞幸咖啡
   #- '+.lkcoffee.com'  #瑞幸咖啡
