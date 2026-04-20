@@ -24,7 +24,6 @@ jobs:
 
     - name: 3. 批量下载并转换规则
       run: |
-        mkdir -p rules
         
         # 👇【全新配置格式】：原始直链 | 规则行为(domain/ipcidr/classical) | 原文格式(yaml/text) | 输出文件名
         RULES=(
@@ -37,7 +36,7 @@ jobs:
           "https://raw.githubusercontent.com/taikwong/clash/refs/heads/main/UnBan.yaml|domain|yaml|UnBan.mrs"
           "https://raw.githubusercontent.com/taikwong/clash/refs/heads/main/BanAD.yaml|domain|yaml|BanAD.mrs"
           "https://raw.githubusercontent.com/taikwong/clash/refs/heads/main/BanProgramAD.yaml|domain|yaml|BanProgramAD.mrs"
-          "https://raw.githubusercontent.com/taikwong/clash/refs/heads/main/BanProgramAD_IP.yaml|ipcidr|yaml|BanProgramAD.mrs"
+          "https://raw.githubusercontent.com/taikwong/clash/refs/heads/main/BanProgramAD_IP.yaml|ipcidr|yaml|BanProgramAD_IP.mrs"
         )
 
         for RULE in "${RULES[@]}"; do
@@ -51,11 +50,11 @@ jobs:
           if curl --fail -sL -A "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36" "$URL" -o temp_rule_file; then
             
             # 执行转换，并捕获 Mihomo 内核本身的报错
-            if ./mihomo convert-ruleset "$BEHAVIOR" "$FORMAT" temp_rule_file "rules/$FILENAME"; then
+            if ./mihomo convert-ruleset "$BEHAVIOR" "$FORMAT" temp_rule_file "./$FILENAME"; then
                echo "✅ $FILENAME 转换成功！"
             else
                echo "❌ 转换失败：文件内容可能不是合法的 $FORMAT 格式"
-               rm -f "rules/$FILENAME" # 转换失败时删除残留的空文件
+               rm -f "./$FILENAME" # 转换失败时删除残留的空文件
             fi
             
           else
@@ -70,7 +69,7 @@ jobs:
       run: |
         git config --local user.email "github-actions[bot]@users.noreply.github.com"
         git config --local user.name "github-actions[bot]"
-        git add rules/*.mrs
+        git add ./*.mrs
         git commit -m "Auto update MRS rules" || echo "No changes to commit"
         # 👇 新增这一行：在推送前先拉取远程最新代码并变基合并，解决冲突
         git pull --rebase origin main
