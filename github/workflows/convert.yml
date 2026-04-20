@@ -1,0 +1,66 @@
+name: Auto Convert YAML to MRS
+
+on:
+  schedule:
+    - cron: '0 */8 * * *' # 每 8 小时执行一次
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: 1. 检出仓库代码
+      uses: actions/checkout@v4
+
+    - name: 2. 下载 Mihomo 内核
+      run: |
+        wget -O mihomo.gz https://github.com/MetaCubeX/mihomo/releases/download/v1.19.24/mihomo-linux-amd64-compatible-v1.19.24.gz
+        gunzip mihomo.gz
+        chmod +x mihomo
+
+    - name: 3. 批量下载 YAML 并转换为 MRS
+      run: |
+        mkdir -p rules
+        
+        # 你的规则配置清单
+        RULES=(
+          "https://raw.githubusercontent.com/taikwong/clash/refs/heads/main/self_direct.yaml|domain|self_direct.mrs"
+          "https://raw.githubusercontent.com/taikwong/clash/refs/heads/main/hsbc_hk_proxy.yaml|domain|hsbc_hk_proxy.mrs"
+          "https://raw.githubusercontent.com/taikwong/clash/refs/heads/main/hk_banks_direct.yaml|domain|hk_banks_direct.mrs"
+          "https://raw.githubusercontent.com/taikwong/clash/refs/heads/main/ai.yaml|domain|ai.mrs"
+          "https://raw.githubusercontent.com/taikwong/clash/refs/heads/main/gemini.yaml|domain|gemini.mrs"
+          "https://api.asailor.org/getruleset?type=4&url=aHR0cHM6Ly9yYXcuZ2l0aHVidXNlcmNvbnRlbnQuY29tL0FDTDRTU1IvQUNMNFNTUi9tYXN0ZXIvQ2xhc2gvUnVsZXNldC9Hb29nbGVDTlByb3h5SVAubGlzdA|ipcidr|GoogleCNProxyIP (IP-CIDR).mrs"
+          "https://api.asailor.org/getruleset?type=3&url=aHR0cHM6Ly9yYXcuZ2l0aHVidXNlcmNvbnRlbnQuY29tL0FDTDRTU1IvQUNMNFNTUi9tYXN0ZXIvQ2xhc2gvVW5CYW4ubGlzdA|domain|UnBan (Domain).mrs"
+          "https://api.asailor.org/getruleset?type=3&url=aHR0cHM6Ly9yYXcuZ2l0aHVidXNlcmNvbnRlbnQuY29tL0FDTDRTU1IvQUNMNFNTUi9tYXN0ZXIvQ2xhc2gvQmFuQUQubGlzdA|domain|BanAD (Domain).mrs"
+          "https://api.asailor.org/getruleset?type=3&url=aHR0cHM6Ly9yYXcuZ2l0aHVidXNlcmNvbnRlbnQuY29tL0FDTDRTU1IvQUNMNFNTUi9tYXN0ZXIvQ2xhc2gvQmFuUHJvZ3JhbUFELmxpc3Q|domain|BanProgramAD (Domain).mrs"
+          "https://api.asailor.org/getruleset?type=4&url=aHR0cHM6Ly9yYXcuZ2l0aHVidXNlcmNvbnRlbnQuY29tL0FDTDRTU1IvQUNMNFNTUi9tYXN0ZXIvQ2xhc2gvQmFuUHJvZ3JhbUFELmxpc3Q|ipcidr|BanProgramAD (IP-CIDR).mrs"
+        )
+
+        # 循环处理每个规则
+        for RULE in "${RULES[@]}"; do
+          IFS='|' read -r URL BEHAVIOR FILENAME <<< "$RULE"
+          
+          echo "========================================="
+          echo "🚀 正在处理: $FILENAME (类型: $BEHAVIOR)"
+          
+          # 下载并覆盖转换，输出的文件名始终保持不变
+          if curl --fail -sL "$URL" -o temp_rule.yaml; then
+            ./mihomo convert-ruleset "$BEHAVIOR" yaml temp_rule.yaml "rules/$FILENAME"
+            echo "✅ $FILENAME 转换成功！"
+          else
+            echo "❌ 下载失败: $URL，跳过此规则！"
+          fi
+          
+        done
+        
+        rm -f temp_rule.yaml mihomo
+
+    - name: 4. 提交并推送到仓库
+      run: |
+        git config --local user.email "github-actions[bot]@users.noreply.github.com"
+        git config --local user.name "github-actions[bot]"
+        git add rules/*.mrs
+        # Git 会自动识别文件是否有变化。如果只有时间戳变了但规则内容没变，Git 也不会产生冗余的 commit
+        git commit -m "Auto update MRS rules" || echo "No changes to commit"
+        git push
