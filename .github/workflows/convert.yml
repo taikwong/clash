@@ -99,11 +99,11 @@ jobs:
           "https://raw.githubusercontent.com/taikwong/clash/refs/heads/main/hk_banks_direct.yaml|domain|yaml|hk_banks_direct.mrs"
           "https://raw.githubusercontent.com/taikwong/clash/refs/heads/main/ai.yaml|domain|yaml|ai.mrs"
           "https://raw.githubusercontent.com/taikwong/clash/refs/heads/main/gemini.yaml|domain|yaml|gemini.mrs"
-          "https://api.asailor.org/getruleset?type=4&url=aHR0cHM6Ly9yYXcuZ2l0aHVidXNlcmNvbnRlbnQuY29tL0FDTDRTU1IvQUNMNFNTUi9tYXN0ZXIvQ2xhc2gvUnVsZXNldC9Hb29nbGVDTlByb3h5SVAubGlzdA|ipcidr|text|GoogleCNProxyIP (IP-CIDR).mrs"
-          "https://api.asailor.org/getruleset?type=3&url=aHR0cHM6Ly9yYXcuZ2l0aHVidXNlcmNvbnRlbnQuY29tL0FDTDRTU1IvQUNMNFNTUi9tYXN0ZXIvQ2xhc2gvVW5CYW4ubGlzdA|domain|text|UnBan (Domain).mrs"
-          "https://api.asailor.org/getruleset?type=3&url=aHR0cHM6Ly9yYXcuZ2l0aHVidXNlcmNvbnRlbnQuY29tL0FDTDRTU1IvQUNMNFNTUi9tYXN0ZXIvQ2xhc2gvQmFuQUQubGlzdA|domain|text|BanAD (Domain).mrs"
-          "https://api.asailor.org/getruleset?type=3&url=aHR0cHM6Ly9yYXcuZ2l0aHVidXNlcmNvbnRlbnQuY29tL0FDTDRTU1IvQUNMNFNTUi9tYXN0ZXIvQ2xhc2gvQmFuUHJvZ3JhbUFELmxpc3Q|domain|text|BanProgramAD (Domain).mrs"
-          "https://api.asailor.org/getruleset?type=4&url=aHR0cHM6Ly9yYXcuZ2l0aHVidXNlcmNvbnRlbnQuY29tL0FDTDRTU1IvQUNMNFNTUi9tYXN0ZXIvQ2xhc2gvQmFuUHJvZ3JhbUFELmxpc3Q|ipcidr|text|BanProgramAD (IP-CIDR).mrs"
+          "https://api.asailor.org/getruleset?type=4&url=aHR0cHM6Ly9yYXcuZ2l0aHVidXNlcmNvbnRlbnQuY29tL0FDTDRTU1IvQUNMNFNTUi9tYXN0ZXIvQ2xhc2gvUnVsZXNldC9Hb29nbGVDTlByb3h5SVAubGlzdA|ipcidr|text|GoogleCNProxyIP.mrs"
+          "https://api.asailor.org/getruleset?type=3&url=aHR0cHM6Ly9yYXcuZ2l0aHVidXNlcmNvbnRlbnQuY29tL0FDTDRTU1IvQUNMNFNTUi9tYXN0ZXIvQ2xhc2gvVW5CYW4ubGlzdA|domain|text|UnBan.mrs"
+          "https://api.asailor.org/getruleset?type=3&url=aHR0cHM6Ly9yYXcuZ2l0aHVidXNlcmNvbnRlbnQuY29tL0FDTDRTU1IvQUNMNFNTUi9tYXN0ZXIvQ2xhc2gvQmFuQUQubGlzdA|domain|text|BanAD.mrs"
+          "https://api.asailor.org/getruleset?type=3&url=aHR0cHM6Ly9yYXcuZ2l0aHVidXNlcmNvbnRlbnQuY29tL0FDTDRTU1IvQUNMNFNTUi9tYXN0ZXIvQ2xhc2gvQmFuUHJvZ3JhbUFELmxpc3Q|domain|text|BanProgramAD.mrs"
+          "https://api.asailor.org/getruleset?type=4&url=aHR0cHM6Ly9yYXcuZ2l0aHVidXNlcmNvbnRlbnQuY29tL0FDTDRTU1IvQUNMNFNTUi9tYXN0ZXIvQ2xhc2gvQmFuUHJvZ3JhbUFELmxpc3Q|ipcidr|text|BanProgramAD.mrs"
         )
 
         for RULE in "${RULES[@]}"; do
@@ -132,10 +132,12 @@ jobs:
         
         rm -f temp_rule_file mihomo
 
-    - name: 4. 提交并推送到仓库
-      run: |
-        git config --local user.email "github-actions[bot]@users.noreply.github.com"
-        git config --local user.name "github-actions[bot]"
-        git add rules/*.mrs
-        git commit -m "Auto update MRS rules" || echo "No changes to commit"
-        git push
+        - name: 4. 提交并推送到仓库
+          run: |
+            git config --local user.email "github-actions[bot]@users.noreply.github.com"
+            git config --local user.name "github-actions[bot]"
+            git add rules/*.mrs
+            git commit -m "Auto update MRS rules" || echo "No changes to commit"
+            # 👇 新增这一行：在推送前先拉取远程最新代码并变基合并，解决冲突
+            git pull --rebase origin main
+            git push
