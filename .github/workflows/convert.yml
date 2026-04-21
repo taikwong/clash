@@ -38,7 +38,7 @@ jobs:
           "https://raw.githubusercontent.com/taikwong/clash/refs/heads/main/BanAD.yaml|domain|yaml|BanAD.mrs"
           "https://raw.githubusercontent.com/taikwong/clash/refs/heads/main/BanProgramAD.yaml|domain|yaml|BanProgramAD.mrs"
           "https://raw.githubusercontent.com/taikwong/clash/refs/heads/main/BanProgramAD_IP.yaml|ipcidr|yaml|BanProgramAD_IP.mrs"
-          "https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/lancidr.txt|ipcidr|text|lancidr.mrs"
+          "https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/lancidr.txt|ipcidr|yaml|lancidr.mrs"
         )
 
         for RULE in "${RULES[@]}"; do
