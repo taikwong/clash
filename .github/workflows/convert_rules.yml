@@ -1,0 +1,131 @@
+name: 自动转换 Sing-box 规则集 (SRS)
+
+on:
+  schedule:
+    # 每隔 8 小时执行一次 (UTC 时间 0, 8, 16 点)
+    - cron: '0 */8 * * *'
+  workflow_dispatch: 
+  push:
+    paths:
+      - '**.yaml'
+      - '**.yml'
+
+jobs:
+  convert:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v4
+
+      - name: 设置 Python 环境
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: 安装依赖
+        run: pip install pyyaml
+
+      - name: 安装 sing-box
+        run: |
+          VERSION=$(curl -s https://api.github.com/repos/SagerNet/sing-box/releases/latest | grep tag_name | cut -d ":" -f 2 | sed 's/\"//g' | sed 's/,//g' | sed 's/ //g' | sed 's/v//')
+          echo "正在安装 sing-box 版本: $VERSION"
+          curl -Lo sing-box.tar.gz https://github.com/SagerNet/sing-box/releases/download/v${VERSION}/sing-box-${VERSION}-linux-amd64.tar.gz
+          tar -xzf sing-box.tar.gz
+          sudo mv sing-box-${VERSION}-linux-amd64/sing-box /usr/local/bin/
+          rm -rf sing-box.tar.gz sing-box-${VERSION}-linux-amd64
+
+      - name: 解析 YAML 并转换为 Sing-box 格式 (Python)
+        run: |
+          cat << 'EOF' > convert.py
+          import yaml
+          import json
+          import os
+          import glob
+
+          os.makedirs('srs_rules', exist_ok=True)
+          os.makedirs('temp_json_rules', exist_ok=True)
+
+          for file in glob.glob('**/*.yaml', recursive=True) + glob.glob('**/*.yml', recursive=True):
+              if '.github' in file:
+                  continue
+              print(f"正在读取: {file}")
+              
+              with open(file, 'r', encoding='utf-8') as f:
+                  try:
+                      data = yaml.safe_load(f)
+                      # 兼容 Clash 标准的 payload: 列表
+                      payload = data.get('payload', []) if isinstance(data, dict) else data
+                  except:
+                      # 兼容纯文本的一行一个域名
+                      f.seek(0)
+                      payload = [line.strip() for line in f if line.strip() and not line.startswith('#')]
+              
+              if not isinstance(payload, list):
+                  print(f"跳过 {file}，未能识别为列表格式。")
+                  continue
+                  
+              rules = {"domain_suffix": [], "domain_keyword": [], "ip_cidr": []}
+              
+              for item in payload:
+                  item = str(item).strip()
+                  if not item or item.startswith('#'):
+                      continue
+                  
+                  # 兼容带有 DOMAIN-SUFFIX, DOMAIN-KEYWORD 等前缀的规则
+                  if ',' in item:
+                      parts = item.split(',')
+                      rtype, val = parts[0].upper(), parts[1].strip()
+                      if 'SUFFIX' in rtype or 'DOMAIN' == rtype:
+                          rules['domain_suffix'].append(val)
+                      elif 'KEYWORD' in rtype:
+                          rules['domain_keyword'].append(val)
+                      elif 'IP' in rtype:
+                          rules['ip_cidr'].append(val)
+                  else:
+                      # 兼容 + .前缀 或纯域名 (Clash 默认将纯域名视作匹配后缀)
+                      if item.startswith('+.'):
+                          rules['domain_suffix'].append(item[2:])
+                      elif item.startswith('.'):
+                          rules['domain_suffix'].append(item[1:])
+                      else:
+                          rules['domain_suffix'].append(item)
+              
+              # 清理空数组
+              rules = {k: v for k, v in rules.items() if v}
+              if not rules:
+                  continue
+              
+              # 构建 Sing-box 要求的 JSON 骨架
+              sing_source = {
+                  "version": 1,
+                  "rules": [rules]
+              }
+              
+              basename = os.path.basename(file).rsplit('.', 1)[0]
+              json_path = f"temp_json_rules/{basename}.json"
+              with open(json_path, 'w', encoding='utf-8') as f:
+                  json.dump(sing_source, f, indent=2)
+              print(f"已生成临时源文件: {json_path}")
+          EOF
+          python convert.py
+
+      - name: 编译为二进制 SRS 规则集
+        run: |
+          for json_file in temp_json_rules/*.json; do
+            if [ -f "$json_file" ]; then
+              filename=$(basename "$json_file" .json)
+              echo "正在编译: $json_file -> ./srs_rules/${filename}.srs"
+              sing-box rule-set compile "$json_file" -o "./srs_rules/${filename}.srs"
+            fi
+          done
+
+      - name: 清理临时文件
+        run: rm -rf temp_json_rules convert.py
+
+      - name: 提交并推送到仓库
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git add ./srs_rules/*.srs
+          # 仅当有文件发生变动时执行 Commit 和 Push
+          git diff --quiet && git diff --staged --quiet || (git commit -m "🤖 自动生成 SRS 规则集: $(date +'%Y-%m-%d %H:%M:%S')" && git push)
